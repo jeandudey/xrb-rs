@@ -1,0 +1,13 @@
+[package]
+name = "xrb"
+version = "0.1.0"
+authors = ["Jean Pierre Dudey <jeandudey@hotmail.com>"]
+
+[dependencies]
+tokio-core = "0.1"
+tokio-uds = "0.1.1"
+tokio-proto = { git = "https://github.com/tokio-rs/tokio-proto" }
+tokio-service = { git = "https://github.com/tokio-rs/tokio-service" }
+futures = "0.1.6"
+byteorder = "0.5"
+xauth = { path = "./xauth" }

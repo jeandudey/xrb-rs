@@ -1,0 +1,8 @@
+[package]
+name = "xauth"
+version = "0.1.0"
+authors = ["Jean Pierre Dudey <jeandudey@hotmail.com>"]
+description = "Crate for working with Xauth files."
+
+[dependencies]
+byteorder = "0.5"
