@@ -18,11 +18,11 @@ fn connect_uds_without_display() {
 
 #[test]
 fn setup_connection() {
-    use xrb::setup::Setup;
+    use xrb::Setup;
     use xauth::Xauth;
 
     let mut lp = Core::new().unwrap();
-    let socket = xrb::connect(1, lp.handle()).unwrap();
+    let socket = xrb::connect(0, lp.handle()).unwrap();
 
     // get auth info
     let path = Xauth::get_path().unwrap(); 

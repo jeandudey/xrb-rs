@@ -10,4 +10,5 @@ tokio-proto = { git = "https://github.com/tokio-rs/tokio-proto" }
 tokio-service = { git = "https://github.com/tokio-rs/tokio-service" }
 futures = "0.1.6"
 byteorder = "0.5"
+bitflags = "0.7"
 xauth = { path = "./xauth" }
