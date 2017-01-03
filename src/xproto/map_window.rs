@@ -15,13 +15,15 @@ impl MapWindow {
     }
 
     /// Creates the request
-    pub fn perform<A: Read + Write + 'static + Send>(self, a: A) -> Box<Future<Item = (A, MapWindow), Error = io::Error>> {
+    pub fn perform<A: Read + Write + 'static + Send>
+        (self,
+         a: A)
+         -> Box<Future<Item = (A, MapWindow), Error = io::Error>> {
         let req_data = try_future!(self.encode_request());
 
         tokio_core::io::write_all(a, req_data)
-            .map(move|(a, _)| {
-                (a, self)
-            }).boxed()
+            .map(move |(a, _)| (a, self))
+            .boxed()
     }
 
     fn encode_request(&self) -> io::Result<Vec<u8>> {
