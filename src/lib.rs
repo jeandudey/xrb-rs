@@ -1,3 +1,11 @@
+#![deny(trivial_casts, trivial_numeric_casts,
+        unsafe_code,
+        unstable_features,
+        unused_import_braces, unused_qualifications)]
+#![cfg_attr(feature = "dev", allow(unstable_features))]
+#![cfg_attr(feature = "dev", feature(plugin))]
+#![cfg_attr(feature = "dev", plugin(clippy))]
+
 //! xrb-rs - X Rust Bindings
 //!
 //! This crate is a proof of concept, it's not ready for production yet, but
@@ -30,8 +38,6 @@ extern crate tokio_uds;
 extern crate futures;
 extern crate byteorder;
 extern crate xauth;
-#[macro_use]
-extern crate bitflags;
 
 #[macro_use]
 pub mod macros;
