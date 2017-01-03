@@ -6,6 +6,9 @@ pub use self::create_window::*;
 mod map_window;
 pub use self::map_window::*;
 
+mod query_extension;
+pub use self::query_extension::*;
+
 /// A window identifier.
 pub type Window = u8;
 
