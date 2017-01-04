@@ -1,7 +1,8 @@
 use ::futures::{self, Future};
 use ::tokio_core;
 use ::byteorder::{WriteBytesExt, NativeEndian};
-use ::std::io::{self, Write, Read};
+use ::std::io;
+use ::Client;
 
 const OPCODE: u8 = 1;
 
@@ -45,10 +46,9 @@ impl CreateWindow {
     }
 
     /// Creates the request
-    pub fn perform<A: Read + Write + 'static + Send>
-        (self,
-         a: A)
-         -> Box<Future<Item = (A, CreateWindow), Error = io::Error>> {
+    pub fn perform(self,
+                   a: Client)
+                   -> Box<Future<Item = (Client, CreateWindow), Error = io::Error>> {
         let req_data = try_future!(self.encode_request());
 
         tokio_core::io::write_all(a, req_data)

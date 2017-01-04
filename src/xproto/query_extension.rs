@@ -1,8 +1,9 @@
-use ::std::io::{self, Read, Write};
+use ::std::io::{self, Write};
 use ::byteorder::{NativeEndian, WriteBytesExt, ReadBytesExt};
-use ::utils::pad;
+use ::pad;
 use ::tokio_core;
 use ::futures::{self, Future};
+use ::Client;
 
 const OPCODE: u8 = 98;
 
@@ -25,10 +26,10 @@ pub struct QueryExtensionResponse {
     pub first_error: u8,
 }
 
-pub fn query_extension<A: Read + Write + 'static + Send>
-    (a: A,
+pub fn query_extension
+    (a: Client,
      name: &[u8])
-     -> Box<Future<Item = (A, QueryExtensionResponse), Error = io::Error>> {
+     -> Box<Future<Item = (Client, QueryExtensionResponse), Error = io::Error>> {
     let req_data = try_future!(encode_request(name));
 
     tokio_core::io::write_all(a, req_data)
