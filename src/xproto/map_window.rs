@@ -1,38 +1,37 @@
-use ::futures::{self, Future};
-use ::tokio_core;
-use ::byteorder::{WriteBytesExt, NativeEndian};
 use ::std::io;
+
+use ::byteorder::WriteBytesExt;
+use ::byteorder::NativeEndian;
+use ::futures;
+use ::futures::Future;
+
+use ::protocol::Request;
+use ::protocol::VoidReply;
 use ::Client;
 
 const OPCODE: u8 = 8;
 
 pub struct MapWindow {
-    window: u32,
+    /// The window to be mapped.
+    pub wid: u32,
 }
 
-impl MapWindow {
-    pub fn new(window: u32) -> Self {
-        MapWindow { window: window }
-    }
+impl Request for MapWindow {
+    type Reply = VoidReply;
 
-    /// Creates the request
-    pub fn perform(self, a: Client) -> Box<Future<Item = (Client, MapWindow), Error = io::Error>> {
-        let req_data = try_future!(self.encode_request());
-
-        tokio_core::io::write_all(a, req_data)
-            .map(move |(a, _)| (a, self))
-            .boxed()
-    }
-
-    fn encode_request(&self) -> io::Result<Vec<u8>> {
-        let mut a = Vec::new();
+    fn encode(&self) -> io::Result<Vec<u8>> {
+        let mut a = io::Cursor::new(vec![]);
         let request_size: u16 = 2;
 
         try!(a.write_u8(OPCODE));
         try!(a.write_u8(0));
         try!(a.write_u16::<NativeEndian>(request_size));
-        try!(a.write_u32::<NativeEndian>(self.window));
+        try!(a.write_u32::<NativeEndian>(self.wid));
 
-        Ok(a)
+        Ok(a.into_inner())
+    }
+
+    fn decode(client: Client) -> Box<Future<Item = (Client, Self::Reply), Error = io::Error>> {
+        Box::new(futures::finished((client, ())))
     }
 }

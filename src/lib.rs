@@ -53,6 +53,8 @@ mod utils;
 mod setup_error;
 pub use setup_error::*;
 
+pub mod protocol;
+
 /// Function used to calculate pad for unused bytes.
 pub fn pad(e: usize) -> usize {
     ((4 - (e % 4)) % 4)
@@ -132,6 +134,15 @@ impl Client {
                 }
             })
             .boxed()
+    }
+
+    pub fn perform<Req: protocol::Request>
+        (self,
+         request: Req)
+         -> Box<Future<Item = (Self, <Req as protocol::Request>::Reply), Error = io::Error>> {
+        let req_data = request.encode().unwrap();
+        Box::new(tokio_core::io::write_all(self, req_data)
+            .and_then(|(client, _)| Req::decode(client)))
     }
 
     /// Returns the server information structure.

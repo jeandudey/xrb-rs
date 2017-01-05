@@ -3,10 +3,11 @@ extern crate xauth;
 extern crate tokio_core;
 extern crate futures;
 
-use xauth::Xauth;
 use tokio_core::reactor::Core;
-use xrb::xproto::{CreateWindow, MapWindow};
+use xrb::xproto::CreateWindow;
+use xrb::xproto::MapWindow;
 use futures::Future;
+use xauth::Xauth;
 
 fn main() {
 
@@ -25,10 +26,20 @@ fn main() {
         (wid, parent)
     };
 
-    let req = CreateWindow::new(wid, parent, 1, 24, 0, 100, 100, 200, 200, 0).perform(client);
-    let (client, _) = lp.run(req).unwrap();
+    let req = client.perform(CreateWindow {
+            wid: wid,
+            parent: parent,
+            class: 1,
+            depth: 24,
+            visual: 0,
+            x: 100,
+            y: 100,
+            width: 200,
+            height: 200,
+            border_width: 0,
+        })
+        .and_then(|(client, _)| client.perform(MapWindow { wid: wid }));
 
-    let req = MapWindow::new(wid).perform(client);
     let (client, _) = lp.run(req).unwrap();
 
     println!("going loop");;

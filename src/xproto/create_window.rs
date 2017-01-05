@@ -1,62 +1,52 @@
-use ::futures::{self, Future};
-use ::tokio_core;
-use ::byteorder::{WriteBytesExt, NativeEndian};
 use ::std::io;
+
+use ::futures;
+use ::futures::Future;
+use ::byteorder::NativeEndian;
+use ::byteorder::WriteBytesExt;
+
+use ::protocol::Request;
+use ::protocol::VoidReply;
 use ::Client;
 
 const OPCODE: u8 = 1;
 
 pub struct CreateWindow {
-    wid: u32,
-    parent: u32,
-    class: u16,
-    depth: u8,
-    visual: u32,
-    x: u16,
-    y: u16,
-    width: u16,
-    height: u16,
-    border_width: u16, // TODO: Add value-list
+    /// The window resource id.
+    pub wid: u32,
+
+    /// The window parent.
+    pub parent: u32,
+
+    /// The class
+    pub class: u16,
+
+    /// Window bit depth.
+    pub depth: u8,
+
+    /// Window visual
+    pub visual: u32,
+
+    /// Window x coordinate on parent.
+    pub x: u16,
+
+    /// Window y coordinate on parent.
+    pub y: u16,
+
+    /// Window width.
+    pub width: u16,
+
+    /// Window height.
+    pub height: u16,
+
+    /// The window border width.
+    pub border_width: u16, // TODO: Add value-list
 }
 
-impl CreateWindow {
-    pub fn new(wid: u32,
-               parent: u32,
-               class: u16,
-               depth: u8,
-               visual: u32,
-               x: u16,
-               y: u16,
-               width: u16,
-               height: u16,
-               border_width: u16)
-               -> CreateWindow {
-        CreateWindow {
-            wid: wid,
-            parent: parent,
-            class: class,
-            depth: depth,
-            visual: visual,
-            x: x,
-            y: y,
-            width: width,
-            height: height,
-            border_width: border_width,
-        }
-    }
+impl Request for CreateWindow {
+    type Reply = VoidReply;
 
-    /// Creates the request
-    pub fn perform(self,
-                   a: Client)
-                   -> Box<Future<Item = (Client, CreateWindow), Error = io::Error>> {
-        let req_data = try_future!(self.encode_request());
-
-        tokio_core::io::write_all(a, req_data)
-            .map(move |(a, _)| (a, self))
-            .boxed()
-    }
-
-    fn encode_request(&self) -> io::Result<Vec<u8>> {
+    fn encode(&self) -> io::Result<Vec<u8>> {
         let mut a = io::Cursor::new(vec![]);
 
         try!(a.write_u8(OPCODE));
@@ -77,5 +67,9 @@ impl CreateWindow {
         try!(a.write_u32::<NativeEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */));
 
         Ok(a.into_inner())
+    }
+
+    fn decode(client: Client) -> Box<Future<Item = (Client, Self::Reply), Error = io::Error>> {
+        Box::new(futures::finished((client, ())))
     }
 }
