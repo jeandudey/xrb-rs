@@ -1,13 +1,19 @@
 //! This module contains all X11 standard requests.
 
-mod create_window;
-pub use self::create_window::*;
+macro_rules! declare_requests {
+    ($($request:ident),+) => {
+        $(
+            mod $request;
+            pub use self::$request::*;
+        )+
+    }
+}
 
-mod map_window;
-pub use self::map_window::*;
-
-mod query_extension;
-pub use self::query_extension::*;
+declare_requests! {
+    create_window,
+    map_window,
+    query_extension
+}
 
 /// A window identifier.
 pub type Window = u8;
