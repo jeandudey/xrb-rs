@@ -43,7 +43,7 @@ pub const GRAVITY_SOUTH: u8 = 8;
 pub const GRAVITY_SOUTH_EAST: u8 = 9;
 pub const GRAVITY_STATIC: u8 = 10;
 
-/// Re-exported BackingStores.
+/// Re-exported `BackingStores`.
 pub use super::BackingStores;
 
 pub const EVENT_KEY_PRESS: u32 = 0x00000001;

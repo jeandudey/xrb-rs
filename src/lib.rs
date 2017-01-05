@@ -103,7 +103,7 @@ impl Client {
                 let buf: Vec<u8> = vec![0u8; setup_generic.additional_data_len as usize * 4];
                 tokio_core::io::read_exact(a, buf).map(move |(a, buf)| (a, setup_generic, buf))
             })
-            .map_err(|e| SetupError::from(e))
+            .map_err(SetupError::from)
             .and_then(|(a, setup_generic, buf)| {
                 let mut reader = io::Cursor::new(buf);
 
@@ -146,7 +146,7 @@ impl Client {
     }
 
     /// Returns the server information structure.
-    pub fn get_server_info<'a>(&'a self) -> &'a ServerInfo {
+    pub fn get_server_info(&self) -> &ServerInfo {
         &self.server_info
     }
 }
@@ -328,25 +328,28 @@ impl SetupGeneric {
     }
 }
 
-fn encode_setup_request(auth_name: &Vec<u8>, auth_data: &Vec<u8>) -> io::Result<Vec<u8>> {
+fn encode_setup_request<D: AsRef<[u8]>>(auth_name: D, auth_data: D) -> io::Result<Vec<u8>> {
+    let name = auth_name.as_ref();
+    let data = auth_data.as_ref();
+
     let mut writer = io::Cursor::new(vec![]);
 
     try!(writer.write_u8(BYTE_ORDER));
     try!(writer.write_u8(0)); // pad
     try!(writer.write_u16::<NativeEndian>(11)); // protocol-major-version
     try!(writer.write_u16::<NativeEndian>(0)); // protocol-minor-version
-    try!(writer.write_u16::<NativeEndian>(auth_name.len() as u16));
-    try!(writer.write_u16::<NativeEndian>(auth_data.len() as u16));
+    try!(writer.write_u16::<NativeEndian>(name.len() as u16));
+    try!(writer.write_u16::<NativeEndian>(data.len() as u16));
     try!(writer.write_u16::<NativeEndian>(0)); // pad
 
-    try!(writer.write(auth_name.as_slice()));
-    for _ in 0..pad(auth_name.len()) {
+    try!(writer.write(name));
+    for _ in 0..pad(name.len()) {
         try!(writer.write_u8(0));
     }
 
 
-    try!(writer.write(auth_data.as_slice()));
-    for _ in 0..pad(auth_data.len()) {
+    try!(writer.write(data));
+    for _ in 0..pad(data.len()) {
         try!(writer.write_u8(0));
     }
 
