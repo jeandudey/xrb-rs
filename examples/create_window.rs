@@ -1,13 +1,12 @@
 extern crate xrb;
-extern crate xauth;
 extern crate tokio_core;
 extern crate futures;
 
 use tokio_core::reactor::Core;
 use xrb::xproto::CreateWindow;
 use xrb::xproto::MapWindow;
+use xrb::Xauth;
 use futures::Future;
-use xauth::Xauth;
 
 fn main() {
 
@@ -15,7 +14,7 @@ fn main() {
     let auth_info = Xauth::read_file(&path).unwrap();
 
     let mut lp = Core::new().unwrap();
-    let req = xrb::Client::connect(1, &auth_info, lp.handle());
+    let req = xrb::Client::connect(0, &auth_info, lp.handle());
 
     let client = lp.run(req).unwrap();
 

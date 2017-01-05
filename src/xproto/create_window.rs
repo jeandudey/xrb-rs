@@ -49,22 +49,22 @@ impl Request for CreateWindow {
     fn encode(&self) -> io::Result<Vec<u8>> {
         let mut a = io::Cursor::new(vec![]);
 
-        try!(a.write_u8(OPCODE));
-        try!(a.write_u8(self.depth));
-        try!(a.write_u16::<NativeEndian>(10)); // TODO: length
-        try!(a.write_u32::<NativeEndian>(self.wid));
-        try!(a.write_u32::<NativeEndian>(self.parent));
-        try!(a.write_u16::<NativeEndian>(self.x));
-        try!(a.write_u16::<NativeEndian>(self.y));
-        try!(a.write_u16::<NativeEndian>(self.width));
-        try!(a.write_u16::<NativeEndian>(self.height));
-        try!(a.write_u16::<NativeEndian>(self.border_width));
-        try!(a.write_u16::<NativeEndian>(self.class));
-        try!(a.write_u32::<NativeEndian>(self.visual));
+        a.write_u8(OPCODE)?;
+        a.write_u8(self.depth)?;
+        a.write_u16::<NativeEndian>(10)?; // TODO: length
+        a.write_u32::<NativeEndian>(self.wid)?;
+        a.write_u32::<NativeEndian>(self.parent)?;
+        a.write_u16::<NativeEndian>(self.x)?;
+        a.write_u16::<NativeEndian>(self.y)?;
+        a.write_u16::<NativeEndian>(self.width)?;
+        a.write_u16::<NativeEndian>(self.height)?;
+        a.write_u16::<NativeEndian>(self.border_width)?;
+        a.write_u16::<NativeEndian>(self.class)?;
+        a.write_u32::<NativeEndian>(self.visual)?;
         // TODO: actually create value-mask and value-list
-        try!(a.write_u32::<NativeEndian>(0x2 /* background-pixel */ | 0x800 /* event-mask */));
-        try!(a.write_u32::<NativeEndian>(0xccffcc));
-        try!(a.write_u32::<NativeEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */));
+        a.write_u32::<NativeEndian>(0x2 /* background-pixel */ | 0x800 /* event-mask */)?;
+        a.write_u32::<NativeEndian>(0xccffcc)?;
+        a.write_u32::<NativeEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */)?;
 
         Ok(a.into_inner())
     }

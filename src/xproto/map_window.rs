@@ -23,10 +23,10 @@ impl Request for MapWindow {
         let mut a = io::Cursor::new(vec![]);
         let request_size: u16 = 2;
 
-        try!(a.write_u8(OPCODE));
-        try!(a.write_u8(0));
-        try!(a.write_u16::<NativeEndian>(request_size));
-        try!(a.write_u32::<NativeEndian>(self.wid));
+        a.write_u8(OPCODE)?;
+        a.write_u8(0)?;
+        a.write_u16::<NativeEndian>(request_size)?;
+        a.write_u32::<NativeEndian>(self.wid)?;
 
         Ok(a.into_inner())
     }

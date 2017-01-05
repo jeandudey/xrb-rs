@@ -25,21 +25,21 @@ impl Request for QueryExtension {
     fn encode(&self) -> io::Result<Vec<u8>> {
         let mut a = io::Cursor::new(vec![]);
 
-        try!(a.write_u8(OPCODE));
-        try!(a.write_u8(0));
+        a.write_u8(OPCODE)?;
+        a.write_u8(0)?;
 
         let n = self.name.len();
         let p = pad(n);
         let len = (2 + (n + p)) / 4;
 
-        try!(a.write_u16::<NativeEndian>(len as u16));
-        try!(a.write_u16::<NativeEndian>(n as u16));
-        try!(a.write_u16::<NativeEndian>(0));
+        a.write_u16::<NativeEndian>(len as u16)?;
+        a.write_u16::<NativeEndian>(n as u16)?;
+        a.write_u16::<NativeEndian>(0)?;
 
-        try!(a.write(self.name.as_slice()));
+        a.write(self.name.as_slice())?;
 
         for _ in 0..p {
-            try!(a.write_u8(0));
+            a.write_u8(0)?;
         }
 
         Ok(a.into_inner())
@@ -51,14 +51,14 @@ impl Request for QueryExtension {
             .and_then(|(client, buf)| {
                 let mut a = io::Cursor::new(buf);
 
-                try!(a.read_u8());
-                try!(a.read_u8());
-                try!(a.read_u16::<NativeEndian>());
-                try!(a.read_u32::<NativeEndian>());
-                let present = try!(a.read_u8()) == 1;
-                let major_opcode = try!(a.read_u8());
-                let first_event = try!(a.read_u8());
-                let first_error = try!(a.read_u8());
+                a.read_u8()?;
+                a.read_u8()?;
+                a.read_u16::<NativeEndian>()?;
+                a.read_u32::<NativeEndian>()?;
+                let present = a.read_u8()? == 1;
+                let major_opcode = a.read_u8()?;
+                let first_event = a.read_u8()?;
+                let first_error = a.read_u8()?;
 
                 Ok((client,
                     QueryExtensionReply {
