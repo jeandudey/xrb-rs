@@ -73,7 +73,7 @@ impl Request for QueryExtension {
 }
 
 /// Reply of `QueryExtension` request.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct QueryExtensionReply {
     /// Determines if the extension is present.
     pub present: bool,
