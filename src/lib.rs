@@ -44,7 +44,9 @@ use tokio_uds::UnixStream;
 use std::io::{self, Read, Write};
 use byteorder::{ReadBytesExt, WriteBytesExt, NativeEndian};
 use futures::Future;
-use xauth::Xauth;
+
+/// `Xauth` is used to get authentication information.
+pub use xauth::Xauth;
 
 #[macro_use]
 mod macros;
