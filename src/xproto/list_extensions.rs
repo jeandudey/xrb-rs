@@ -1,5 +1,5 @@
 use ::std::io;
-use ::std::io::Write;
+use ::std::io::Read;
 
 use ::futures::Future;
 use ::byteorder::NativeEndian;
@@ -19,7 +19,7 @@ pub struct ListExtensions;
 impl Request for ListExtensions {
     type Reply = Vec<String>;
 
-    fn encode(&self) -> io::Result<Vec<u8>> {
+    fn encode(&mut self) -> io::Result<Vec<u8>> {
         let mut a = io::Cursor::new(vec![]);
 
         a.write_u8(OPCODE)?;
@@ -47,26 +47,21 @@ impl Request for ListExtensions {
                 tokio_core::io::read_exact(client, buf)
                     .map(move |(client, buf)| (client, str_count, buf))
             })
-            .map(|(client, str_count, buf)| {
+            .and_then(|(client, str_count, buf)| {
+                let mut a = io::Cursor::new(buf);
                 let mut list = Vec::new();
 
-                let mut iter = buf.into_iter();
-
                 for _ in 0..str_count {
+                    let size = a.read_u8()? as u64;
                     let mut s = String::new();
-                    while let Some(c) = iter.next() {
-                        match c {
-                            0x00 | 0x01 | 0x02 | 0x03 | 0x04 | 0x05 | 0x06 | 0x07 | 0x08 |
-                            0x09 | 0x0A | 0x0B | 0x0C | 0x0D | 0x0E | 0x0F | 0x10 | 0x17 |
-                            0x18 | 0x19 | 0x7F => break,
-                            _ => s.push(char::from(c)),
-                        }
+                    {
+                        a.by_ref().take(size).read_to_string(&mut s)?;
                     }
 
                     list.push(s);
                 }
 
-                (client, list)
+                Ok((client, list))
             }))
     }
 }
