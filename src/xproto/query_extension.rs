@@ -22,15 +22,15 @@ pub struct QueryExtension {
 impl Request for QueryExtension {
     type Reply = QueryExtensionReply;
 
-    fn encode(&self) -> io::Result<Vec<u8>> {
+    fn encode(&mut self) -> io::Result<Vec<u8>> {
         let mut a = io::Cursor::new(vec![]);
-
-        a.write_u8(OPCODE)?;
-        a.write_u8(0)?;
 
         let n = self.name.len();
         let p = pad(n);
-        let len = (2 + (n + p)) / 4;
+        let len = 2 + ((n + p) / 4);
+
+        a.write_u8(OPCODE)?;
+        a.write_u8(0)?;
 
         a.write_u16::<NativeEndian>(len as u16)?;
         a.write_u16::<NativeEndian>(n as u16)?;
