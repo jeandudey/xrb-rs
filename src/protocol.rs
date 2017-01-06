@@ -16,3 +16,14 @@ pub trait Request {
 
 /// This is used for requests that don't return a reply.
 pub type VoidReply = ();
+
+pub type ExtensionInfo = ::xproto::QueryExtensionReply;
+
+/// An X11 Protocol extension request.
+pub trait ExtensionRequest {
+    type Reply: 'static;
+
+    fn extension_name() -> &'static [u8];
+    fn encode(&self, info: &ExtensionInfo) -> io::Result<Vec<u8>>;
+    fn decode(client: Client) -> Box<Future<Item = (Client, Self::Reply), Error = io::Error>>;
+}

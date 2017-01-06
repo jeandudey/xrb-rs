@@ -42,6 +42,7 @@ extern crate xauth;
 use tokio_core::reactor::Handle;
 use tokio_uds::UnixStream;
 use std::io::{self, Read, Write};
+use std::collections::HashMap;
 use byteorder::{ReadBytesExt, WriteBytesExt, NativeEndian};
 use futures::Future;
 
@@ -66,6 +67,7 @@ pub fn pad(e: usize) -> usize {
 pub struct Client {
     socket: UnixStream,
     server_info: ServerInfo,
+    extensions: HashMap<&'static [u8], protocol::ExtensionInfo>,
 }
 
 impl Client {
@@ -133,6 +135,7 @@ impl Client {
                 Client {
                     socket: socket,
                     server_info: server_info,
+                    extensions: HashMap::new(),
                 }
             })
             .boxed()
@@ -145,6 +148,31 @@ impl Client {
         let req_data = request.encode().unwrap();
         Box::new(tokio_core::io::write_all(self, req_data)
             .and_then(|(client, _)| Req::decode(client)))
+    }
+
+    pub fn perform_ex<Req: protocol::ExtensionRequest + 'static>
+        (self,
+         request: Req)
+         -> Box<Future<Item = (Self, <Req as protocol::ExtensionRequest>::Reply), Error = io::Error>> {
+        let extension_name = Req::extension_name();
+        let maybe_extension = {
+            self.extensions.get(extension_name).cloned()
+        };
+
+        if let Some(info) = maybe_extension {
+            let req_data = request.encode(&info).unwrap();
+            Box::new(tokio_core::io::write_all(self, req_data)
+                .and_then(|(client, _)| Req::decode(client)))
+        } else {
+            Box::new(self.perform(xproto::QueryExtension { name: extension_name.to_owned() })
+                .and_then(move |(mut client, info)| {
+                    client.extensions.insert(extension_name, info.clone());
+
+                    let req_data = request.encode(&info).unwrap();
+                    tokio_core::io::write_all(client, req_data)
+                        .and_then(|(client, _)| Req::decode(client))
+                }))
+        }
     }
 
     /// Returns the server information structure.
@@ -557,3 +585,4 @@ impl Visual {
 }
 
 pub mod xproto;
+pub mod xc_misc;
