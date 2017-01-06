@@ -143,7 +143,7 @@ impl Client {
 
     pub fn perform<Req: protocol::Request>
         (self,
-         request: Req)
+         mut request: Req)
          -> Box<Future<Item = (Self, <Req as protocol::Request>::Reply), Error = io::Error>> {
         let req_data = request.encode().unwrap();
         Box::new(tokio_core::io::write_all(self, req_data)
@@ -152,7 +152,7 @@ impl Client {
 
     pub fn perform_ex<Req: protocol::ExtensionRequest + 'static>
         (self,
-         request: Req)
+         mut request: Req)
          -> Box<Future<Item = (Self, <Req as protocol::ExtensionRequest>::Reply), Error = io::Error>> {
         let extension_name = Req::extension_name();
         let maybe_extension = {

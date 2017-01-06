@@ -28,7 +28,7 @@ impl ExtensionRequest for XCMiscGetVersion {
         b"XC-MISC"
     }
 
-    fn encode(&self, info: &ExtensionInfo) -> io::Result<Vec<u8>> {
+    fn encode(&mut self, info: &ExtensionInfo) -> io::Result<Vec<u8>> {
         let mut a = io::Cursor::new(vec![]);
 
         a.write_u8(info.major_opcode)?;

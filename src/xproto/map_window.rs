@@ -19,7 +19,7 @@ pub struct MapWindow {
 impl Request for MapWindow {
     type Reply = VoidReply;
 
-    fn encode(&self) -> io::Result<Vec<u8>> {
+    fn encode(&mut self) -> io::Result<Vec<u8>> {
         let mut a = io::Cursor::new(vec![]);
         let request_size: u16 = 2;
 
