@@ -12,7 +12,8 @@ macro_rules! declare_requests {
 declare_requests! {
     create_window,
     map_window,
-    query_extension
+    query_extension,
+    list_extensions
 }
 
 /// A window identifier.
