@@ -94,8 +94,11 @@ I you wan't to see this project evolve please consider donating, i will apprecia
 
 **Flattr**: https://flattr.com/profile/jeandudey
 
+# Self-Promotion
+If you like **xrb** - give it a star and share it.
+
 # License
-`xrb-rs` is licensed under the terms of the MIT license.
+`xrb-rs` is licensed under the terms of the MIT license. You can find a full copy of it [here][license].
 
 # Contact 
 My email: jeandudey@hotmail.com
@@ -112,3 +115,4 @@ This project was't made possible without:
 [3]: https://github.com/BurntSushi/byteorder/ 
 [4]: http://www.x.org/releases/X11R7.7/doc/xproto/x11protocol.html
 [my-profile]: https://github.com/jeandudey/
+[license]:  https://github.com/jeandudey/xrb-rs/blob/master/LICENSE
