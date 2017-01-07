@@ -50,9 +50,7 @@ impl ExtensionRequest for XCMiscGetVersion {
             a.read_u16::<NativeEndian>()?;
             a.read_u32::<NativeEndian>()?;
             let major = a.read_u16::<NativeEndian>()?;
-            println!("got here!5");
             let minor = a.read_u16::<NativeEndian>()?;
-            println!("got here!6");
 
             let reply = XCMiscGetVersionReply {
                 server_major_version: major,
