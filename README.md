@@ -18,7 +18,7 @@ Put the following in your `Cargo.toml`:
 
 ```toml
 [dependencies.xrb]
-git = https://github.com/jeandudey/xrb-rs
+git = "https://github.com/jeandudey/xrb-rs"
 ```
 
 And this to your crate root:
@@ -29,6 +29,8 @@ extern crate tokio_core;
 ```
 
 ## Example
+This example shows how to create a window.
+
 ```rust
 extern crate tokio_core;
 extern crate xrb;
@@ -41,10 +43,13 @@ fn main() {
 - **Jean Pierre Dudey** - *Initial work* - [jeandudey][my-profile]
 
 # Donations
-I you wan't to see this project evolving please consider donatin, i will appreciate it! 
-BitCoin: 144VTHr1vCmFvtjnv1ThMXuNA1SDDjxK3h
-LiteCoin: LL3jvLLAp1oq6mshu9DCiMUYAMnsZeqra2
-flattr: https://flattr.com/profile/jeandudey
+I you wan't to see this project evolve please consider donatin, i will appreciate it!
+
+**BitCoin**: `144VTHr1vCmFvtjnv1ThMXuNA1SDDjxK3h`
+
+**LiteCoin**: `LL3jvLLAp1oq6mshu9DCiMUYAMnsZeqra2`
+
+**Flattr**: https://flattr.com/profile/jeandudey
 
 # License
 `xrb-rs` is licensed under the terms of the MIT license.
@@ -58,10 +63,9 @@ This project was't made possible without:
 - [tokio-core][2]
 - [byteorder][3]
 - [The X.Org X11 Protocol Standard][4]
-- My mother that brought me to life.
 
-1: https://github.com/alexcrichton/futures-rs/
-2: https://github.com/tokio-rs/tokio-core/
-3: https://github.com/BurntSushi/byteorder/ 
-4: http://www.x.org/releases/X11R7.7/doc/xproto/x11protocol.html
-my-profile: https://github.com/jeandudey/
+[1]: https://github.com/alexcrichton/futures-rs/
+[2]: https://github.com/tokio-rs/tokio-core/
+[3]: https://github.com/BurntSushi/byteorder/ 
+[4]: http://www.x.org/releases/X11R7.7/doc/xproto/x11protocol.html
+[my-profile]: https://github.com/jeandudey/
