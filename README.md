@@ -22,6 +22,15 @@ git = "https://github.com/jeandudey/xrb-rs"
 ```
 
 And this to your crate root:
+```rust
+extern crate xrb;
+extern crate tokio_core;
+extern crate futures;
+```
+
+
+## Example
+This example shows how to create a window.
 
 ```rust
 extern crate xrb;
@@ -73,22 +82,11 @@ fn main() {
 }
 ```
 
-## Example
-This example shows how to create a window.
-
-```rust
-extern crate tokio_core;
-extern crate xrb;
-
-fn main() {
-}
-```
-
 # Authors
 - **Jean Pierre Dudey** - *Initial work* - [jeandudey][my-profile]
 
 # Donations
-I you wan't to see this project evolve please consider donatin, i will appreciate it!
+I you wan't to see this project evolve please consider donating, i will appreciate it!
 
 **BitCoin**: `144VTHr1vCmFvtjnv1ThMXuNA1SDDjxK3h`
 
