@@ -11,13 +11,13 @@ fn main() {
     let auth_info = Xauth::read_file(&path).unwrap();
 
     let mut lp = Core::new().unwrap();
-    let req = xrb::Client::connect(0, &auth_info, lp.handle());
+    let req = xrb::Client::connect(1, &auth_info, lp.handle());
 
     let client = lp.run(req).unwrap();
 
     let req = client.perform_ex(XCMiscGetVersion {
-        client_major_version: 11,
-        client_minor_version: 0,
+        client_major_version: 1,
+        client_minor_version: 1,
     });
 
     let (_, reply) = lp.run(req).unwrap();

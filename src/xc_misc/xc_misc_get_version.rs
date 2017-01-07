@@ -42,15 +42,17 @@ impl ExtensionRequest for XCMiscGetVersion {
 
     fn decode(client: Client) -> Box<Future<Item = (Client, Self::Reply), Error = io::Error>> {
         let buf: [u8; 32] = [0u8; 32];
-        Box::new(tokio_core::io::read_exact(client, buf).and_then(|(client, _)| {
-            let mut a = io::Cursor::new(vec![]);
+        Box::new(tokio_core::io::read_exact(client, buf).and_then(|(client, buf)| {
+            let mut a = io::Cursor::new(buf);
 
             a.read_u8()?;
             a.read_u8()?;
             a.read_u16::<NativeEndian>()?;
             a.read_u32::<NativeEndian>()?;
             let major = a.read_u16::<NativeEndian>()?;
+            println!("got here!5");
             let minor = a.read_u16::<NativeEndian>()?;
+            println!("got here!6");
 
             let reply = XCMiscGetVersionReply {
                 server_major_version: major,
