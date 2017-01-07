@@ -82,6 +82,18 @@ fn main() {
 }
 ```
 
+# Contribuiting
+All contributions are appreciated! Here are some basic instructions:
+- Fork and clone the project.
+- Create a topic branch (example: feat/resolve-protcol-error)
+- Commit your changes using the projects commit guidelines.
+- Squash your commits (if necessary).
+- Make sure your code compiles.
+- Open a pull request.
+- Wait for a review.
+
+**Note:** if your change affect some code that it's exposed on README.md please update it.
+
 # Authors
 - **Jean Pierre Dudey** - *Initial work* - [jeandudey][my-profile]
 
