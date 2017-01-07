@@ -166,7 +166,7 @@ impl Client {
         } else {
             Box::new(self.perform(xproto::QueryExtension { name: extension_name.to_owned() })
                 .and_then(move |(mut client, info)| {
-                    client.extensions.insert(extension_name, info.clone());
+                    client.extensions.insert(extension_name, info);
 
                     let req_data = request.encode(&info).unwrap();
                     tokio_core::io::write_all(client, req_data)

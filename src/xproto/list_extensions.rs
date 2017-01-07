@@ -9,7 +9,6 @@ use ::tokio_core;
 
 use ::protocol::Request;
 use ::Client;
-use ::pad;
 
 const OPCODE: u8 = 99;
 
