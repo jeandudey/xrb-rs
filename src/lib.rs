@@ -39,11 +39,16 @@ extern crate futures;
 extern crate byteorder;
 extern crate xauth;
 
+use std::io;
+use std::io::Read;
+use std::io::Write;
+use std::collections::HashMap;
+
+use byteorder::ReadBytesExt;
+use byteorder::WriteBytesExt;
+use byteorder::NativeEndian;
 use tokio_core::reactor::Handle;
 use tokio_uds::UnixStream;
-use std::io::{self, Read, Write};
-use std::collections::HashMap;
-use byteorder::{ReadBytesExt, WriteBytesExt, NativeEndian};
 use futures::Future;
 
 /// `Xauth` is used to get authentication information.
@@ -181,13 +186,13 @@ impl Client {
     }
 }
 
-impl io::Read for Client {
+impl Read for Client {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         self.socket.read(buf)
     }
 }
 
-impl io::Write for Client {
+impl Write for Client {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.socket.write(buf)
     }
@@ -207,13 +212,13 @@ impl tokio_core::io::Io for Client {
     }
 }
 
-impl<'a> io::Read for &'a Client {
+impl<'a> Read for &'a Client {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         (&self.socket).read(buf)
     }
 }
 
-impl<'a> io::Write for &'a Client {
+impl<'a> Write for &'a Client {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         (&self.socket).write(buf)
     }
