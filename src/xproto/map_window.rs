@@ -7,13 +7,14 @@ use ::futures::Future;
 
 use ::protocol::Request;
 use ::protocol::VoidReply;
+use ::xproto::Window;
 use ::Client;
 
 const OPCODE: u8 = 8;
 
 pub struct MapWindow {
     /// The window to be mapped.
-    pub wid: u32,
+    pub wid: Window,
 }
 
 impl Request for MapWindow {

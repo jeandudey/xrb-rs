@@ -7,13 +7,14 @@ use ::byteorder::WriteBytesExt;
 
 use ::protocol::Request;
 use ::protocol::VoidReply;
+use ::xproto::Window;
 use ::Client;
 
 const OPCODE: u8 = 1;
 
 pub struct CreateWindow {
     /// The window resource id.
-    pub wid: u32,
+    pub wid: Window,
 
     /// The window parent.
     pub parent: u32,
