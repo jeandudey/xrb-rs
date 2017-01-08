@@ -16,6 +16,9 @@ declare_requests! {
     list_extensions
 }
 
+/// A X11 Protocol ID
+pub type Xid = u32;
+
 /// A window identifier.
 pub type Window = u8;
 

@@ -8,6 +8,7 @@ use ::tokio_core;
 
 use ::protocol::ExtensionRequest;
 use ::protocol::ExtensionInfo;
+use ::xproto::Xid;
 use ::Client;
 
 const XC_MISC_OPCODE: u8 = 2;
@@ -19,7 +20,7 @@ pub struct XCMiscGetXIDList {
 }
 
 impl ExtensionRequest for XCMiscGetXIDList {
-    type Reply = Vec<u32>; // TODO: Reemplaze u32 with Xid.
+    type Reply = Vec<Xid>;
 
     fn extension_name() -> &'static [u8] {
         b"XC-MISC"

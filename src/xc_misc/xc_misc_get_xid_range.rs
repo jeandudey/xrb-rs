@@ -8,6 +8,7 @@ use ::tokio_core;
 
 use ::protocol::ExtensionRequest;
 use ::protocol::ExtensionInfo;
+use ::xproto::Xid;
 use ::Client;
 
 const XC_MISC_OPCODE: u8 = 1;
@@ -58,8 +59,8 @@ impl ExtensionRequest for XCMiscGetXIDRange {
 #[derive(Debug, Clone, Copy)]
 pub struct XCMiscGetXIDRangeReply {
     /// The first ID in the range.
-    pub start_id: u32, // TODO: Reemplaze u32 with Xid.
+    pub start_id: Xid,
 
     /// The number of IDs in the range.
-    pub count: u32,
+    pub count: Xid,
 }
