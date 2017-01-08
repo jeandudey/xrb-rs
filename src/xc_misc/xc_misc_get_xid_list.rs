@@ -36,6 +36,7 @@ impl ExtensionRequest for XCMiscGetXIDList {
         Ok(a.into_inner())
     }
 
+    #[cfg_attr(feature = "dev", allow(needless_range_loop))]
     fn decode(client: Client) -> Box<Future<Item = (Client, Self::Reply), Error = io::Error>> {
         let buf: [u8; 32] = [0u8; 32];
         Box::new(tokio_core::io::read_exact(client, buf)
