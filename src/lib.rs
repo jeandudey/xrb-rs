@@ -73,6 +73,7 @@ pub struct Client {
     socket: UnixStream,
     server_info: ServerInfo,
     extensions: HashMap<&'static [u8], protocol::ExtensionInfo>,
+    xid: XidData,
 }
 
 impl Client {
@@ -137,10 +138,12 @@ impl Client {
                 }
             })
             .map(|(socket, server_info)| {
+                let xid = XidData::new(&server_info);
                 Client {
                     socket: socket,
                     server_info: server_info,
                     extensions: HashMap::new(),
+                    xid: xid,
                 }
             })
             .boxed()
@@ -177,6 +180,35 @@ impl Client {
                     tokio_core::io::write_all(client, req_data)
                         .and_then(|(client, _)| Req::decode(client))
                 }))
+        }
+    }
+
+    /// Generates a XID.
+    pub fn generate_id(mut self) -> Box<Future<Item = (Client, u32), Error = io::Error>> {
+        if self.xid.last >= (self.xid.max - self.xid.inc + 1) {
+            if self.xid.last == 0 {
+                self.xid.max = self.server_info.resource_id_mask;
+                let xid = self.xid.last | self.xid.base;
+                Box::new(futures::finished((self, xid)))
+            } else {
+                Box::new(self.perform_ex(xc_misc::XCMiscGetXIDRange)
+                    .and_then(|(mut client, range)| {
+                        if range.start_id == 0 && range.count == 1 {
+                            return Err(io::Error::new(io::ErrorKind::InvalidData,
+                                                      "Server is out of XIDs"));
+                        }
+
+                        client.xid.last = range.start_id;
+                        client.xid.max = range.start_id + (range.count - 1) * client.xid.inc;
+
+                        let xid = client.xid.last | client.xid.base;
+                        Ok((client, xid))
+                    }))
+            }
+        } else {
+            self.xid.last += self.xid.inc;
+            let xid = self.xid.last | self.xid.base;
+            Box::new(futures::finished((self, xid)))
         }
     }
 
@@ -235,6 +267,24 @@ impl<'a> tokio_core::io::Io for &'a Client {
 
     fn poll_write(&mut self) -> futures::Async<()> {
         self.socket.poll_write()
+    }
+}
+
+struct XidData {
+    pub last: u32,
+    pub max: u32,
+    pub base: u32,
+    pub inc: u32,
+}
+
+impl XidData {
+    pub fn new(server_info: &ServerInfo) -> XidData {
+        XidData {
+            last: 0,
+            max: 0,
+            base: server_info.resource_id_base,
+            inc: server_info.resource_id_mask & !server_info.resource_id_mask,
+        }
     }
 }
 
