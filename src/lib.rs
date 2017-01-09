@@ -184,7 +184,7 @@ impl Client {
     }
 
     /// Generates a XID.
-    pub fn generate_id(mut self) -> Box<Future<Item = (Client, Xid), Error = io::Error>> {
+    pub fn generate_id(mut self) -> Box<Future<Item = (Client, xproto::Xid), Error = io::Error>> {
         if self.xid.last >= (self.xid.max - self.xid.inc + 1) {
             if self.xid.last == 0 {
                 self.xid.max = self.server_info.resource_id_mask;
