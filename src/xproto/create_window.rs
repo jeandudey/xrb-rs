@@ -1,4 +1,5 @@
 use ::std::io;
+use ::std::io::Write;
 
 use ::futures;
 use ::futures::Future;
@@ -8,6 +9,7 @@ use ::byteorder::WriteBytesExt;
 use ::protocol::Request;
 use ::protocol::VoidReply;
 use ::xproto::Window;
+use ::xproto::WindowAttributes;
 use ::Client;
 
 const OPCODE: u8 = 1;
@@ -41,7 +43,9 @@ pub struct CreateWindow {
     pub height: u16,
 
     /// The window border width.
-    pub border_width: u16, // TODO: Add value-list
+    pub border_width: u16,
+
+    pub attrs: WindowAttributes,
 }
 
 impl Request for CreateWindow {
@@ -50,9 +54,11 @@ impl Request for CreateWindow {
     fn encode(&mut self) -> io::Result<Vec<u8>> {
         let mut a = io::Cursor::new(vec![]);
 
+        let (buf, n) = self.attrs.encode()?;
+
         a.write_u8(OPCODE)?;
         a.write_u8(self.depth)?;
-        a.write_u16::<NativeEndian>(10)?; // TODO: length
+        a.write_u16::<NativeEndian>(8 + n)?;
         a.write_u32::<NativeEndian>(self.wid)?;
         a.write_u32::<NativeEndian>(self.parent)?;
         a.write_u16::<NativeEndian>(self.x)?;
@@ -62,10 +68,7 @@ impl Request for CreateWindow {
         a.write_u16::<NativeEndian>(self.border_width)?;
         a.write_u16::<NativeEndian>(self.class)?;
         a.write_u32::<NativeEndian>(self.visual)?;
-        // TODO: actually create value-mask and value-list
-        a.write_u32::<NativeEndian>(0x2 /* background-pixel */ | 0x800 /* event-mask */)?;
-        a.write_u32::<NativeEndian>(0xccffcc)?;
-        a.write_u32::<NativeEndian>(0x1 /* KeyPress */ | 0x8000 /* Exposure */)?;
+        a.write(buf.as_slice())?;
 
         Ok(a.into_inner())
     }
