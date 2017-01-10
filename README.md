@@ -109,7 +109,7 @@ If you like **xrb** - give it a star and share it.
 # License
 `xrb-rs` is licensed under the terms of the MIT license. You can find a full copy of it [here][license].
 
-# Contact 
+# Contact
 My email: jeandudey@hotmail.com
 
 # Acknowledgements
@@ -121,7 +121,7 @@ This project was't made possible without:
 
 [1]: https://github.com/alexcrichton/futures-rs/
 [2]: https://github.com/tokio-rs/tokio-core/
-[3]: https://github.com/BurntSushi/byteorder/ 
+[3]: https://github.com/BurntSushi/byteorder/
 [4]: http://www.x.org/releases/X11R7.7/doc/xproto/x11protocol.html
 [my-profile]: https://github.com/jeandudey/
 [license]:  https://github.com/jeandudey/xrb-rs/blob/master/LICENSE
