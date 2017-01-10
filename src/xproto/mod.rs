@@ -40,86 +40,40 @@ pub type Cursor = u32;
 /// Bit gravity.
 #[derive(Debug, Clone, Copy)]
 pub enum BitGravity {
-    Forget,
-    NorthWest,
-    North,
-    NorthEast,
-    West,
-    Center,
-    East,
-    SouthWest,
-    South,
-    SouthEast,
-    Static,
-}
-
-impl Into<u32> for BitGravity {
-    fn into(self) -> u32 {
-        match self {
-            BitGravity::Forget => 0,
-            BitGravity::NorthWest => 1,
-            BitGravity::North => 2,
-            BitGravity::NorthEast => 3,
-            BitGravity::West => 4,
-            BitGravity::Center => 5,
-            BitGravity::East => 6,
-            BitGravity::SouthWest => 7,
-            BitGravity::South => 8,
-            BitGravity::SouthEast => 9,
-            BitGravity::Static => 10,
-        }
-    }
+    Forget = 0,
+    NorthWest = 1,
+    North = 2,
+    NorthEast = 3,
+    West = 4,
+    Center = 5,
+    East = 6,
+    SouthWest = 7,
+    South = 8,
+    SouthEast = 9,
+    Static = 10,
 }
 
 /// Window gravity.
 #[derive(Debug, Clone, Copy)]
 pub enum WinGravity {
-    Unmap,
-    NorthWest,
-    North,
-    NorthEast,
-    West,
-    Center,
-    East,
-    SouthWest,
-    South,
-    SouthEast,
-    Static,
-}
-
-impl Into<u32> for WinGravity {
-    fn into(self) -> u32 {
-        match self {
-            WinGravity::Unmap => 0,
-            WinGravity::NorthWest => 1,
-            WinGravity::North => 2,
-            WinGravity::NorthEast => 3,
-            WinGravity::West => 4,
-            WinGravity::Center => 5,
-            WinGravity::East => 6,
-            WinGravity::SouthWest => 7,
-            WinGravity::South => 8,
-            WinGravity::SouthEast => 9,
-            WinGravity::Static => 10,
-        }
-    }
+    Unmap = 0,
+    NorthWest = 1,
+    North = 2,
+    NorthEast = 3,
+    West = 4,
+    Center = 5,
+    East = 6,
+    SouthWest = 7,
+    South = 8,
+    SouthEast = 9,
+    Static = 10,
 }
 
 #[derive(Debug, Clone, Copy)]
 pub enum BackingStore {
-    NotUseful,
-    WhenMapped,
-    Always,
-}
-
-impl Into<u32> for BackingStore {
-    fn into(self) -> u32 {
-        match self {
-            BackingStore::NotUseful => 0,
-            BackingStore::WhenMapped => 1,
-            BackingStore::Always => 2,
-        }
-    }
+    NotUseful = 0,
+    WhenMapped = 1,
+    Always = 2,
 }
 
 pub type Event = u32;
@@ -331,22 +285,22 @@ impl WindowAttributes {
         }
 
         if (self.value_mask & 0x00000010) == 0x00000010 {
-            a.write_u32::<NativeEndian>(self.bit_gravity.into())?;
+            a.write_u32::<NativeEndian>(self.bit_gravity as u32)?;
             count += 1;
         }
 
         if (self.value_mask & 0x00000020) == 0x00000020 {
-            a.write_u32::<NativeEndian>(self.win_gravity.into())?;
+            a.write_u32::<NativeEndian>(self.win_gravity as u32)?;
             count += 1;
         }
 
         if (self.value_mask & 0x00000040) == 0x00000040 {
-            a.write_u32::<NativeEndian>(self.backing_store.into())?;
+            a.write_u32::<NativeEndian>(self.backing_store as u32)?;
             count += 1;
         }
 
         if (self.value_mask & 0x00000080) == 0x00000080 {
-            a.write_u32::<NativeEndian>(self.backing_planes)?;
+            a.write_u32::<NativeEndian>(self.backing_planes as u32)?;
             count += 1;
         }
 
