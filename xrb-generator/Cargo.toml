@@ -1,0 +1,7 @@
+[package]
+name = "xrb-generator"
+version = "0.1.0"
+authors = ["Jean Pierre Dudey <jeandudey@hotmail.com>"]
+
+[dependencies]
+xml-rs = "0.3"
