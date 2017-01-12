@@ -17,6 +17,7 @@ pub fn parse<R: Read>(reader: &mut R) -> Result<Xcb, Error> {
         Start,
         End,
         Xcb,
+        Struct(Struct),
     }
 
     let mut state = State::Start;
@@ -50,7 +51,48 @@ pub fn parse<R: Read>(reader: &mut R) -> Result<Xcb, Error> {
                     _ => return Err(Error::from("Expected EOF")),
                 }
             }
-            State::Xcb => State::Xcb,
+            State::Xcb => {
+                match e {
+                    XmlEvent::StartElement { ref name, ref attributes, .. } => {
+                        match &*name.local_name {
+                            "struct" => {
+                                let mut s = Struct::default();
+                                try!(s.parse_attributes(attributes));
+                                State::Struct(s)
+                            }
+                            _ => State::Xcb,
+                        }
+                    }
+                    XmlEvent::EndElement { .. } => State::Xcb,
+                    _ => State::Xcb,
+                }
+            }
+            State::Struct(mut s) => {
+                match e {
+                    XmlEvent::StartElement { ref name, ref attributes, .. } => {
+                        match &*name.local_name {
+                            "field" => {
+                                let mut field = Field::default();
+                                field.parse_attributes(attributes);
+                                s.fields.push(Fields::Field(field));
+                            }
+                            _ => return Err(Error::from("Invalid <struct> tag child")),
+                        }
+
+                        State::Struct(s)
+                    }
+                    XmlEvent::EndElement { ref name, .. } => {
+                        match &*name.local_name {
+                            "struct" => {
+                                xcb_tag.structs.push(s);
+                                State::Xcb
+                            }
+                            _ => State::Struct(s),
+                        }
+                    }
+                    _ => State::Struct(s),
+                }
+            }
         };
     }
 
@@ -125,12 +167,16 @@ impl std::error::Error for Error {
 /// Xcb Tag
 #[derive(Debug, Default)]
 pub struct Xcb {
-    header: String,
-    extension_xname: Option<String>,
-    extension_name: Option<String>,
-    extension_multiword: Option<bool>,
-    major_version: Option<usize>,
-    minor_version: Option<usize>,
+    // Attributes
+    pub header: String,
+    pub extension_xname: Option<String>,
+    pub extension_name: Option<String>,
+    pub extension_multiword: Option<bool>,
+    pub major_version: Option<usize>,
+    pub minor_version: Option<usize>,
+
+    // Childs
+    pub structs: Vec<Struct>,
 }
 
 impl Xcb {
@@ -163,6 +209,61 @@ impl Xcb {
     }
 }
 
+#[derive(Debug, Default)]
+pub struct Struct {
+    // Attributes
+    pub name: String,
+
+    // Childs
+    pub fields: Vec<Fields>,
+}
+
+impl Struct {
+    fn parse_attributes(&mut self, attributes: &[OwnedAttribute]) -> Result<(), Error> {
+        for attr in attributes {
+            match &*attr.name.local_name {
+                "name" => self.name = attr.value.clone(),
+                _ => return Err(Error::from("Invalid attribute for <struct> tag")),
+            }
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub enum Fields {
+    Pad(usize),
+    Field(Field),
+}
+
+#[derive(Debug, Default)]
+pub struct Field {
+    // Attributes
+    pub name: String,
+    pub type_: String,
+    pub enum_: Option<String>,
+    pub altenum: Option<String>,
+    pub mask: Option<String>,
+}
+
+impl Field {
+    fn parse_attributes(&mut self, attributes: &[OwnedAttribute]) -> Result<(), Error> {
+        for attr in attributes {
+            match &*attr.name.local_name {
+                "name" => self.name = attr.value.clone(),
+                "type" => self.type_ = attr.value.clone(),
+                "enum" => self.enum_ = Some(attr.value.clone()),
+                "altenum" => self.altenum = Some(attr.value.clone()),
+                "mask" => self.mask = Some(attr.value.clone()),
+                _ => return Err(Error::from("Invalid attribute for <field> tag")),
+            }
+        }
+
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use ::std;
@@ -182,5 +283,31 @@ mod tests {
         assert_eq!(root.extension_multiword, None);
         assert_eq!(root.major_version, None);
         assert_eq!(root.minor_version, None);
+    }
+
+    #[test]
+    fn parse_struct() {
+        use super::Fields;
+
+        let s = r#"<?xml version="1.0" encoding="utf-8"?>
+                   <xcb header="xproto">
+                     <struct name="CHAR2B">
+                       <field type="CARD8" name="byte1" />
+                       <field type="CARD8" name="byte2" />
+                     </struct>
+                   </xcb>"#;
+
+        let mut reader = io::Cursor::new(s);
+        let root = super::parse(&mut reader).unwrap();
+        assert_eq!(root.structs[0].name, "CHAR2B");
+        match root.structs[0].fields[0] {
+            Fields::Field(ref f) => assert_eq!(f.name, "byte1"),
+            _ => panic!("Not valid field"),
+        }
+
+        match root.structs[0].fields[1] {
+            Fields::Field(ref f) => assert_eq!(f.name, "byte2"),
+            _ => panic!("Not valid field"),
+        }
     }
 }

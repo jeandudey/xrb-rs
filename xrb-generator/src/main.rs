@@ -1,11 +1,13 @@
 extern crate xml;
 
 mod proto;
+mod generator;
 
 use std::fs;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
+use std::path::PathBuf;
 use std::env;
 
 fn main() {
@@ -57,7 +59,7 @@ fn main() {
             }
         };
 
-        let root: proto::Xcb = match proto::parse(&mut file) {
+        let root = match proto::parse(&mut file) {
             Ok(x) => x,
             Err(e) => {
                 println!("Error: {}: {}", path.display(), e);
@@ -65,6 +67,8 @@ fn main() {
             }
         };
 
-        println!("{:?}", root);
+        let mut pb = PathBuf::new().join(output_folder.clone()).join(format!("{}.rs", root.header));
+
+        generator::generate(pb, root).unwrap();
     }
 }
