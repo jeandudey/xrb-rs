@@ -76,6 +76,16 @@ pub fn parse<R: Read>(reader: &mut R) -> Result<Xcb, Error> {
                                 field.parse_attributes(attributes);
                                 s.fields.push(Fields::Field(field));
                             }
+                            "pad" => {
+                                let mut pad = 0usize;
+                                for attr in attributes {
+                                    match &*attr.name.local_name {
+                                        "bytes" => pad = try!(usize::from_str(attr.value.as_str())),
+                                        _ => return Err(Error::from("Invalid <tag> attribute")),
+                                    }
+                                }
+                                s.fields.push(Fields::Pad(pad));
+                            }
                             _ => return Err(Error::from("Invalid <struct> tag child")),
                         }
 

@@ -22,10 +22,10 @@ pub fn generate<P: AsRef<Path>>(output_file: P, root: ::proto::Xcb) -> io::Resul
                              to_rust_type(fi.type_.as_str()))
                         ?
                 }
-                _ => unreachable!(),
+                Fields::Pad(pad) => (),
             }
         }
-        writeln!(&mut f, "}}")?;
+        writeln!(&mut f, "}}\n")?;
     }
 
     f.flush()?;
@@ -33,17 +33,33 @@ pub fn generate<P: AsRef<Path>>(output_file: P, root: ::proto::Xcb) -> io::Resul
     Ok(())
 }
 
-fn to_rust_type(ty: &str) -> &'static str {
+fn to_rust_type(ty: &str) -> String {
+    use std::ops::Index;
+
     match ty {
-        "CARD8" => "u8",
-        "CARD16" => "u16",
-        "CARD32" => "u32",
-        "INT8" => "i8",
-        "INT16" => "i16",
-        "INT32" => "i32",
-        "BOOL" => "bool",
-        "ATOM" => "u32",
-        "SURFACE" => "u32",
-        _ => panic!("Not a valid type: {}", ty),
+        "CARD8" => "u8".to_string(),
+        "CARD16" => "u16".to_string(),
+        "CARD32" => "u32".to_string(),
+        "INT8" => "i8".to_string(),
+        "INT16" => "i16".to_string(),
+        "INT32" => "i32".to_string(),
+        "BOOL" => "bool".to_string(),
+        _ => {
+            let split = ty.split_at(1);
+            let mut lower = split.1.to_lowercase();
+            lower.insert(0, split.0.chars().nth(0).unwrap());
+            lower
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    fn to_rust_type() {
+        let rty = super::to_rust_type("DOTCLOCK");
+        assert_eq!(rty, "Dotclock");
+
+        let rty = super::to_rust_type("CARD8");
+        assert_eq!(rty, "u8");
     }
 }
