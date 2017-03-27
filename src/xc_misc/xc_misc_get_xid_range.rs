@@ -4,7 +4,7 @@ use ::futures::Future;
 use ::byteorder::NativeEndian;
 use ::byteorder::WriteBytesExt;
 use ::byteorder::ReadBytesExt;
-use ::tokio_core;
+use ::tokio_io;
 
 use ::protocol::ExtensionRequest;
 use ::protocol::ExtensionInfo;
@@ -35,7 +35,7 @@ impl ExtensionRequest for XCMiscGetXIDRange {
 
     fn decode(client: Client) -> Box<Future<Item = (Client, Self::Reply), Error = io::Error>> {
         let buf: [u8; 32] = [0u8; 32];
-        Box::new(tokio_core::io::read_exact(client, buf).and_then(|(client, buf)| {
+        Box::new(tokio_io::io::read_exact(client, buf).and_then(|(client, buf)| {
             let mut a = io::Cursor::new(buf);
 
             a.read_u8()?;

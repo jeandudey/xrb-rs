@@ -5,7 +5,7 @@ use ::futures::Future;
 use ::byteorder::NativeEndian;
 use ::byteorder::WriteBytesExt;
 use ::byteorder::ReadBytesExt;
-use ::tokio_core;
+use ::tokio_io;
 
 use ::protocol::Request;
 use ::Client;
@@ -47,7 +47,7 @@ impl Request for QueryExtension {
 
     fn decode(client: Client) -> Box<Future<Item = (Client, Self::Reply), Error = io::Error>> {
         let buf: [u8; 32] = [0u8; 32];
-        tokio_core::io::read_exact(client, buf)
+        tokio_io::io::read_exact(client, buf)
             .and_then(|(client, buf)| {
                 let mut a = io::Cursor::new(buf);
 
