@@ -5,7 +5,7 @@ use ::futures::Future;
 use ::byteorder::NativeEndian;
 use ::byteorder::WriteBytesExt;
 use ::byteorder::ReadBytesExt;
-use ::tokio_core;
+use ::tokio_io;
 
 use ::protocol::Request;
 use ::Client;
@@ -30,7 +30,7 @@ impl Request for ListExtensions {
 
     fn decode(client: Client) -> Box<Future<Item = (Client, Self::Reply), Error = io::Error>> {
         let buf: [u8; 32] = [0u8; 32];
-        Box::new(tokio_core::io::read_exact(client, buf)
+        Box::new(tokio_io::io::read_exact(client, buf)
             .and_then(|(client, buf)| {
                 let mut a = io::Cursor::new(buf);
 
@@ -43,7 +43,7 @@ impl Request for ListExtensions {
             })
             .and_then(|(client, str_count, reply_length)| {
                 let buf: Vec<u8> = vec![0u8; reply_length as usize * 4];
-                tokio_core::io::read_exact(client, buf)
+                tokio_io::io::read_exact(client, buf)
                     .map(move |(client, buf)| (client, str_count, buf))
             })
             .and_then(|(client, str_count, buf)| {

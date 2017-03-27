@@ -35,6 +35,7 @@
 
 extern crate tokio_core;
 extern crate tokio_uds;
+extern crate tokio_io;
 extern crate futures;
 extern crate byteorder;
 extern crate xauth;
@@ -100,10 +101,10 @@ impl Client {
 
         let req_data = encode_setup_request(&auth_info.name, &auth_info.data).unwrap();
 
-        tokio_core::io::write_all(socket, req_data)
+        tokio_io::io::write_all(socket, req_data)
             .and_then(|(a, _)| {
                 let buf: [u8; 8] = [0u8; 8];
-                tokio_core::io::read_exact(a, buf).and_then(|(a, buf)| {
+                tokio_io::io::read_exact(a, buf).and_then(|(a, buf)| {
                     let mut reader = io::Cursor::new(buf);
                     let setup_generic = try!(SetupGeneric::read(&mut reader));
                     Ok((a, setup_generic))
@@ -111,7 +112,7 @@ impl Client {
             })
             .and_then(|(a, setup_generic)| {
                 let buf: Vec<u8> = vec![0u8; setup_generic.additional_data_len as usize * 4];
-                tokio_core::io::read_exact(a, buf).map(move |(a, buf)| (a, setup_generic, buf))
+                tokio_io::io::read_exact(a, buf).map(move |(a, buf)| (a, setup_generic, buf))
             })
             .map_err(SetupError::from)
             .and_then(|(a, setup_generic, buf)| {
@@ -154,7 +155,7 @@ impl Client {
          mut request: Req)
          -> Box<Future<Item = (Self, <Req as protocol::Request>::Reply), Error = io::Error>> {
         let req_data = request.encode().unwrap();
-        Box::new(tokio_core::io::write_all(self, req_data)
+        Box::new(tokio_io::io::write_all(self, req_data)
             .and_then(|(client, _)| Req::decode(client)))
     }
 
@@ -169,7 +170,7 @@ impl Client {
 
         if let Some(info) = maybe_extension {
             let req_data = request.encode(&info).unwrap();
-            Box::new(tokio_core::io::write_all(self, req_data)
+            Box::new(tokio_io::io::write_all(self, req_data)
                 .and_then(|(client, _)| Req::decode(client)))
         } else {
             Box::new(self.perform(xproto::QueryExtension { name: extension_name.to_owned() })
@@ -177,7 +178,7 @@ impl Client {
                     client.extensions.insert(extension_name, info);
 
                     let req_data = request.encode(&info).unwrap();
-                    tokio_core::io::write_all(client, req_data)
+                    tokio_io::io::write_all(client, req_data)
                         .and_then(|(client, _)| Req::decode(client))
                 }))
         }
@@ -234,13 +235,10 @@ impl Write for Client {
     }
 }
 
-impl tokio_core::io::Io for Client {
-    fn poll_read(&mut self) -> futures::Async<()> {
-        self.socket.poll_read()
-    }
-
-    fn poll_write(&mut self) -> futures::Async<()> {
-        self.socket.poll_write()
+impl tokio_io::AsyncRead for Client {}
+impl tokio_io::AsyncWrite for Client {
+    fn shutdown(&mut self) -> futures::Poll<(), io::Error> {
+        tokio_io::AsyncWrite::shutdown(&mut self.socket)
     }
 }
 
@@ -260,15 +258,6 @@ impl<'a> Write for &'a Client {
     }
 }
 
-impl<'a> tokio_core::io::Io for &'a Client {
-    fn poll_read(&mut self) -> futures::Async<()> {
-        self.socket.poll_read()
-    }
-
-    fn poll_write(&mut self) -> futures::Async<()> {
-        self.socket.poll_write()
-    }
-}
 
 struct XidData {
     pub last: u32,

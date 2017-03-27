@@ -4,7 +4,7 @@ use ::futures::Future;
 use ::byteorder::NativeEndian;
 use ::byteorder::WriteBytesExt;
 use ::byteorder::ReadBytesExt;
-use ::tokio_core;
+use ::tokio_io;
 
 use ::protocol::ExtensionRequest;
 use ::protocol::ExtensionInfo;
@@ -40,7 +40,7 @@ impl ExtensionRequest for XCMiscGetXIDList {
     #[cfg_attr(feature = "dev", allow(needless_range_loop))]
     fn decode(client: Client) -> Box<Future<Item = (Client, Self::Reply), Error = io::Error>> {
         let buf: [u8; 32] = [0u8; 32];
-        Box::new(tokio_core::io::read_exact(client, buf)
+        Box::new(tokio_io::io::read_exact(client, buf)
             .and_then(|(client, buf)| {
                 let mut a = io::Cursor::new(buf);
 
@@ -54,7 +54,7 @@ impl ExtensionRequest for XCMiscGetXIDList {
             })
             .and_then(|(client, count)| {
                 let buf = vec![0u8; count * 4];
-                tokio_core::io::read_exact(client, buf)
+                tokio_io::io::read_exact(client, buf)
                     .map(move |(client, buf)| (client, count, buf))
             })
             .and_then(|(client, count, buf)| {
