@@ -94,15 +94,6 @@ All contributions are appreciated! Here are some basic instructions:
 # Authors
 - **Jean Pierre Dudey** - *Initial work* - [jeandudey][my-profile]
 
-# Donations
-I you wan't to see this project evolve please consider donating, i will appreciate it!
-
-**BitCoin**: `144VTHr1vCmFvtjnv1ThMXuNA1SDDjxK3h`
-
-**LiteCoin**: `LL3jvLLAp1oq6mshu9DCiMUYAMnsZeqra2`
-
-**Flattr**: https://flattr.com/profile/jeandudey
-
 # Self-Promotion
 If you like **xrb** - give it a star and share it.
 
